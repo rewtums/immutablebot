@@ -5,7 +5,7 @@ load "^no u$", fn (speaker, args) ->
 end
 
 load "(^\\.bots$)", fn (speaker, args) ->
-  "Reporting in! [Elixir]"
+  "Reporting in! [Elixir] https://github.com/rewtums/immutablebot"
 end
 
 load "(^\\.hn$)", fn (speaker, args) ->
