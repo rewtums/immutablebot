@@ -1,0 +1,10 @@
+%{"certifi": {:hex, :certifi, "0.3.0"},
+  "hackney": {:hex, :hackney, "1.4.7"},
+  "html_entities": {:hex, :html_entities, "0.2.1"},
+  "html_sanitize_ex": {:hex, :html_sanitize_ex, "0.1.2"},
+  "httpoison": {:hex, :httpoison, "0.8.0"},
+  "idna": {:hex, :idna, "1.0.2"},
+  "jsx": {:hex, :jsx, "2.8.0"},
+  "mimerl": {:hex, :mimerl, "1.0.2"},
+  "mochiweb": {:hex, :mochiweb, "2.12.2"},
+  "ssl_verify_hostname": {:hex, :ssl_verify_hostname, "1.0.5"}}
