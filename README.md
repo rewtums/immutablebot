@@ -20,7 +20,7 @@ Right now, only SSL connections are made. Plain TCP is not planned to be support
   2. Install dependencies with hex
 
       ```
-      mix.deps get
+      mix deps.get
       ```
 
 ## Running immutablebot
