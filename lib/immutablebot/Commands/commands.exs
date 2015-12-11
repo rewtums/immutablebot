@@ -13,6 +13,5 @@ load "(^\\.hn$)", fn (speaker, args) ->
 end
 
 load "(^\\.rip) (.*)", fn (speaker, args) ->
-  return = Enum.at(args, 1)
-  "RIP in pieces #{return}"
+  "RIP in pieces #{Enum.at args, 2}"
 end

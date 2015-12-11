@@ -64,8 +64,8 @@ defmodule Immutablebot.Server do
 
       if command do
         { pattern, func } = command
-        args = Regex.split(pattern, phrase, parts: 2)
-        result = func.(speaker_name, Enum.at(args, 1))
+        [ args ] = Regex.scan(pattern, phrase)
+        result = func.(speaker_name, args)
 
         if target == "#{@nick}" do
           reply_target = speaker_name
