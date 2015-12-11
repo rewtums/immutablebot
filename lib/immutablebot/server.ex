@@ -11,7 +11,7 @@ defmodule Immutablebot.Server do
   # External API
 
   def start_link do
-    { :ok, pid } = GenServer.start_link(@name, [], name: @name)
+    { :ok, pid } = GenServer.start_link(@name, :ok, name: @name)
   end
 
   def connect do
@@ -36,11 +36,11 @@ defmodule Immutablebot.Server do
   #####
   # GenServer implementation
 
-  def handle_call(:connect, _from, _) do
+  def init(:ok) do
     { :ok, socket } = :ssl.connect(:erlang.binary_to_list(@server), @port, [:binary, {:active, true}])
     GenServer.cast @name, { :send, "NICK #{@nick}"}
     GenServer.cast @name, { :send, "USER #{@nick} #{@server} #{@nick} :#{@nick}" }
-    { :reply, socket, socket }
+    { :ok, socket }
   end
 
   def handle_cast({:new_line, data}, socket) do

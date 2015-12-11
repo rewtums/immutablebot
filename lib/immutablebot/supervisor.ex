@@ -5,7 +5,6 @@ defmodule Immutablebot.Supervisor do
     {:ok, sup } = Supervisor.start_link(__MODULE__, [])
     start_workers(sup)
     Code.require_file("lib/immutablebot/Commands/commands.exs")
-    Immutablebot.Server.connect
     {:ok, sup }
   end
 
