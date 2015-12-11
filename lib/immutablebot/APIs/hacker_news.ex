@@ -23,7 +23,7 @@ defmodule API.Hacker_News do
     |> handle_response
     |> return_comment_id
   end
-  
+
   def hn_url(item) do
     "https://hacker-news.firebaseio.com/v0/item/#{item}.json?print=pretty"
   end
@@ -46,9 +46,21 @@ defmodule API.Hacker_News do
 
   def return_story_id({ :ok, json }) do
     _ = :random.seed(:os.timestamp)
-    Enum.random json
+    story_id = Enum.random json
+    if check_story_for_comments(story_id) > 0 do
+      story_id
+    else
+      return_story_id({ :ok, json })
+    end
   end
-  
+
+  def check_story_for_comments(story) do
+    {:ok, json} = hn_url(story) |> HTTPoison.get(@user_agent) |> handle_response
+    dict = Enum.into(json, HashDict.new)
+    comments_count = HashDict.get(dict, "descendants", 0)
+    comments_count
+  end
+
   def return_text({ :ok, json }) do
     dict = Enum.into(json, HashDict.new)
     text = HtmlEntities.decode(HtmlSanitizeEx.strip_tags(HashDict.get(dict, "text", "")))
@@ -72,7 +84,7 @@ defmodule API.Hacker_News do
     comments_count = HashDict.get(dict, "descendants", 0)
     if comments_count > 0 do
       _ = :random.seed(:os.timestamp)
-      Enum.random comments 
+      Enum.random comments
     end
   end
 end
