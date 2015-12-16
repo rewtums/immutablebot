@@ -3,10 +3,6 @@ defmodule Immutablebot.Server do
   require Logger
 
   @name __MODULE__
-  @nick Application.get_env(:immutablebot, :nick)
-  @channel Application.get_env(:immutablebot, :channel)
-  @server Application.get_env(:immutablebot, :server)
-  @port Application.get_env(:immutablebot, :port )
 
   #####
   # External API
@@ -24,6 +20,10 @@ defmodule Immutablebot.Server do
     GenServer.cast @name, { :send, data }
   end
 
+  def say(data) do
+    GenServer.cast @name, {:send, data}
+  end
+
   def join(channel) do
     data = "JOIN #{ channel }"
     GenServer.cast @name, { :send, data }
@@ -35,12 +35,20 @@ defmodule Immutablebot.Server do
   end
 
   #####
+  # Environment information
+  defp nick, do: Application.get_env(:immutablebot, :nick)
+  defp channel, do: Application.get_env(:immutablebot, :channel)
+  defp server, do: Application.get_env(:immutablebot, :server)
+  defp port, do: Application.get_env(:immutablebot, :port )
+
+
+  #####
   # GenServer implementation
 
   def init(:ok) do
-    { :ok, socket } = :ssl.connect(:erlang.binary_to_list(@server), @port, [:binary, {:active, true}])
-    GenServer.cast @name, { :send, "NICK #{@nick}"}
-    GenServer.cast @name, { :send, "USER #{@nick} #{@server} #{@nick} :#{@nick}" }
+    { :ok, socket } = :ssl.connect(:erlang.binary_to_list(server), port, [:binary, {:active, true}])
+    say "NICK #{nick}"
+    say "USER #{nick} #{server} #{nick} :#{nick}"
     { :ok, socket }
   end
 
@@ -53,8 +61,8 @@ defmodule Immutablebot.Server do
 
     Logger.debug data
 
-    if Regex.match?(motd_end, data), do: GenServer.cast @name, { :send, "JOIN #{@channel}" }
-    if Regex.match?(ping, data), do: GenServer.cast @name, { :send, "PONG #{connected_server}" }
+    if Regex.match?(motd_end, data), do: say "JOIN #{channel}"
+    if Regex.match?(ping, data), do: say "PONG #{connected_server}"
     if Regex.match?(privmsg, data) do
       [ info, phrase ] = Enum.map(Regex.split(~r/:/, data, [trim: true, parts: 2]), &(String.strip(&1)))
       [ user, target ] = Enum.map(String.split(info, "PRIVMSG"), &(String.strip(&1)))
@@ -67,13 +75,13 @@ defmodule Immutablebot.Server do
         [ args ] = Regex.scan(pattern, phrase)
         result = func.(speaker_name, args)
 
-        if target == "#{@nick}" do
+        if target == "#{nick}" do
           reply_target = speaker_name
         else
           reply_target = target
         end
 
-        GenServer.cast @name, { :send, "PRIVMSG #{reply_target} :#{result}" }
+        say "PRIVMSG #{reply_target} :#{result}"
       end
     end
     { :noreply, socket }
