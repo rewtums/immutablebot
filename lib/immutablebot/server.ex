@@ -11,10 +11,6 @@ defmodule Immutablebot.Server do
     { :ok, pid } = GenServer.start_link(@name, :ok, name: @name)
   end
 
-  def connect do
-    GenServer.call @name, :connect
-  end
-
   def say(phrase, target) do
     data = "PRIVMSG #{target} :#{phrase}"
     GenServer.cast @name, { :send, data }
@@ -36,11 +32,11 @@ defmodule Immutablebot.Server do
 
   #####
   # Environment information
+
   defp nick, do: Application.get_env(:immutablebot, :nick)
   defp channel, do: Application.get_env(:immutablebot, :channel)
   defp server, do: Application.get_env(:immutablebot, :server)
   defp port, do: Application.get_env(:immutablebot, :port )
-
 
   #####
   # GenServer implementation
@@ -53,7 +49,6 @@ defmodule Immutablebot.Server do
   end
 
   def handle_cast({:new_line, data}, socket) do
-
     connected_server = Enum.at(Regex.split(~r/\s/, data), 1)
     ping      = ~r/\APING/
     motd_end  = ~r/\/MOTD/
