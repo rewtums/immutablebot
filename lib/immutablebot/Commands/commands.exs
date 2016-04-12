@@ -13,7 +13,7 @@ load "(^\\.bots$)", fn (speaker, args) ->
 end
 
 load "(^\\.bigshrug$)", fn (speaker, args) ->
-  "¯\_____________(ツ)_____________/¯"
+  "¯\\_____________(ツ)_____________/¯"
 end
 
 load "(^\\.hn$)", fn (speaker, args) ->
