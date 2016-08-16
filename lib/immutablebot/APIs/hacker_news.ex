@@ -1,11 +1,18 @@
 defmodule API.Hacker_News do
+  require Logger
+
   def fetch do
-    get_story
-    |> get_comment
-    |> hn_url
-    |> HTTPoison.get
-    |> handle_response
-    |> return_text
+    with { :ok, story_id } <- get_story do
+      story_id
+        |> get_comment
+        |> hn_url
+        |> HTTPoison.get
+        |> handle_response
+        |> return_text
+    else
+      { :error, reason } -> "There was an error: " <> to_string(reason)
+      _ -> "Repent now, for we are all doomed to failure"
+    end
   end
 
   def get_story do
@@ -16,7 +23,8 @@ defmodule API.Hacker_News do
   end
 
   def comments_on_story(story) do
-    hn_url(story)
+    story
+    |> hn_url
     |> HTTPoison.get
     |> handle_response
   end
@@ -28,10 +36,14 @@ defmodule API.Hacker_News do
   end
 
   def hn_url(item) do
+    Logger.debug "Getting item #{item} from API"
+
     "https://hacker-news.firebaseio.com/v0/item/#{item}.json?print=pretty"
   end
 
   def top_stories_url do
+    Logger.debug "Getting top stories from API"
+
     "https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty"
   end
 
@@ -48,15 +60,19 @@ defmodule API.Hacker_News do
   end
 
   def return_story_id({ :ok, json }) do
-    _ = :random.seed(:os.timestamp)
+    :rand.seed(:exsplus, :os.timestamp)
 
     story_id = Enum.random(json)
 
     if check_story_for_comments(story_id) > 0 do
-      story_id
+      { :ok, story_id }
     else
       return_story_id({ :ok, json })
     end
+  end
+
+  def return_story_id({ :error, reason }) do
+    { :error, reason }
   end
 
   def check_story_for_comments(story) do
@@ -84,11 +100,11 @@ defmodule API.Hacker_News do
   end
 
   def return_text({ :error, reason }) do
-    "There was an error" <> reason
+    "There was an error" <> to_string(reason)
   end
 
   def return_comment_id({ :ok, json }) do
-    _ = :random.seed(:os.timestamp)
+    :rand.seed(:exsplus, :os.timestamp)
 
     json
       |> Enum.into(%{})

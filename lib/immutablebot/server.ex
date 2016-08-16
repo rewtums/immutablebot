@@ -8,7 +8,7 @@ defmodule Immutablebot.Server do
   # External API
 
   def start_link do
-    { :ok, pid } = GenServer.start_link(@name, :ok, name: @name)
+    { :ok, _pid } = GenServer.start_link(@name, :ok, name: @name)
   end
 
   def say(phrase, target) do
@@ -71,12 +71,10 @@ defmodule Immutablebot.Server do
         result = func.(speaker_name, args)
 
         if target == "#{nick}" do
-          reply_target = speaker_name
+          say "PRIVMSG #{speaker_name} :#{result}"
         else
-          reply_target = target
+          say "PRIVMSG #{target} :#{result}"
         end
-
-        say "PRIVMSG #{reply_target} :#{result}"
       end
     end
     { :noreply, socket }
