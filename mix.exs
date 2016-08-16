@@ -4,7 +4,7 @@ defmodule Immutablebot.Mixfile do
   def project do
     [app: :immutablebot,
      version: "0.0.1",
-     elixir: "~> 1.1",
+     elixir: "~> 1.3.2",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps]
@@ -28,9 +28,9 @@ defmodule Immutablebot.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [ { :httpoison, ">= 0.0.0" },
-      { :jsx, ">= 0.0.0" },
-      { :html_entities, "~> 0.2" },
-      { :html_sanitize_ex, "~> 0.1.0" } ]
+    [ { :httpoison, ">= 0.9.0" },
+      { :jsx, ">= 2.8.0" },
+      { :html_entities, "~> 0.3.0" },
+      { :html_sanitize_ex, "~> 1.0.1" } ]
   end
 end

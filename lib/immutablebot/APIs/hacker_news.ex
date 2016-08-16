@@ -1,26 +1,29 @@
 defmodule API.Hacker_News do
-  @user_agent [ {"User-agent", "IRCbot bot@irc.org"} ]
-
   def fetch do
     get_story
     |> get_comment
     |> hn_url
-    |> HTTPoison.get(@user_agent)
+    |> HTTPoison.get
     |> handle_response
     |> return_text
   end
 
   def get_story do
     top_stories_url
-    |> HTTPoison.get(@user_agent)
+    |> HTTPoison.get
     |> handle_response
     |> return_story_id
   end
 
-  def get_comment(story) do
+  def comments_on_story(story) do
     hn_url(story)
-    |> HTTPoison.get(@user_agent)
+    |> HTTPoison.get
     |> handle_response
+  end
+
+  def get_comment(story) do
+    story
+    |> comments_on_story
     |> return_comment_id
   end
 
@@ -36,17 +39,19 @@ defmodule API.Hacker_News do
     "news.ycombinator.com/item?id=#{item}"
   end
 
-  def handle_response({ :ok, %HTTPoison.Response{status_code: 200, body: body}}) do
+  def handle_response({ :ok, %HTTPoison.Response{status_code: _, body: body}}) do
     { :ok, :jsx.decode(body) }
   end
 
-  def handle_response({ :ok, %HTTPoison.Response{status_code: _, body: body}}) do
-    { :error, :jsx.decode(body)}
+  def handle_response({ :error, %HTTPoison.Error{id: _, reason: reason} }) do
+    { :error, reason }
   end
 
   def return_story_id({ :ok, json }) do
     _ = :random.seed(:os.timestamp)
-    story_id = Enum.random json
+
+    story_id = Enum.random(json)
+
     if check_story_for_comments(story_id) > 0 do
       story_id
     else
@@ -55,16 +60,22 @@ defmodule API.Hacker_News do
   end
 
   def check_story_for_comments(story) do
-    {:ok, json} = hn_url(story) |> HTTPoison.get(@user_agent) |> handle_response
-    dict = Enum.into(json, HashDict.new)
-    comments_count = HashDict.get(dict, "descendants", 0)
-    comments_count
+    with { :ok, json } <- comments_on_story(story) do
+      json
+      |> Enum.into(%{})
+      |> Map.get("descendants", 0)
+    else
+      _ -> 0
+    end
   end
 
   def return_text({ :ok, json }) do
-    dict = Enum.into(json, HashDict.new)
-    text = HtmlEntities.decode(HtmlSanitizeEx.strip_tags(HashDict.get(dict, "text", "")))
-    comment_id = HashDict.get(dict, "id", 0)
+    text = json
+             |> Enum.into(%{})
+             |> Map.get("text", "")
+             |> HtmlSanitizeEx.strip_tags
+             |> HtmlEntities.decode
+    
     if String.length(text) > 298 do
       String.slice(text, 0, 298)
     else
@@ -72,19 +83,16 @@ defmodule API.Hacker_News do
     end
   end
 
-  def return_text({ :error, json }) do
-    dict = Enum.into(json, HashDict.new)
-    error = HashDict.get(dict, "error")
-    Enum.join ["There was an error: ", error]
+  def return_text({ :error, reason }) do
+    "There was an error" <> reason
   end
 
   def return_comment_id({ :ok, json }) do
-    dict = Enum.into(json, HashDict.new)
-    comments = HashDict.get(dict, "kids", [])
-    comments_count = HashDict.get(dict, "descendants", 0)
-    if comments_count > 0 do
-      _ = :random.seed(:os.timestamp)
-      Enum.random comments
-    end
+    _ = :random.seed(:os.timestamp)
+
+    json
+      |> Enum.into(%{})
+      |> Map.get("kids", [])
+      |> Enum.random
   end
 end
