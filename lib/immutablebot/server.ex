@@ -59,14 +59,15 @@ defmodule Immutablebot.Server do
     if Regex.match?(motd_end, data), do: say "JOIN #{channel}"
     if Regex.match?(ping, data), do: say "PONG #{connected_server}"
     if Regex.match?(privmsg, data) do
-      [ info, phrase ] = Enum.map(Regex.split(~r/:/, data, [trim: true, parts: 2]), &(String.strip(&1)))
-      [ user, target ] = Enum.map(String.split(info, "PRIVMSG"), &(String.strip(&1)))
-      [ speaker_name, username ] = Enum.map(String.split(user, "!"), &(String.strip(&1)))
+      [ user, _msg, target, phrase ] = data
+                                         |> String.split(~r/ /, parts: 4, trim: true)
+                                         |> Enum.map(&(String.replace_leading(String.trim(&1), ":", "")))
+
+      [ speaker_name, username ] = String.split(user, "!", parts: 2, trim: true) 
 
       command = Command.Agent.find(phrase)
 
-      if command do
-        { pattern, func } = command
+      with { pattern, func } <- Command.Agent.find(phrase) do
         [ args ] = Regex.scan(pattern, phrase)
         result = func.(speaker_name, args)
 

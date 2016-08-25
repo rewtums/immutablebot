@@ -10,17 +10,17 @@ defmodule Command.Agent do
     end
 
     def find(phrase) do
-      set = Agent.get(@name, fn(set) -> set end)
-      Enum.find(set, fn ({ pattern, _ }) -> Regex.match?(pattern, phrase) end)
+      Agent.get(@name, fn(set) -> set end)
+        |> Enum.find(fn ({ pattern, _ }) -> Regex.match?(pattern, phrase) end)
     end
 
     def load(phrase, func) do
-      { :ok, pattern } = Regex.compile(phrase)
-      Agent.update(@name, fn(set) -> Set.put(set, { pattern, func }) end)
+      with { :ok, pattern } <-  Regex.compile(phrase) do
+        Agent.update(@name, fn(set) -> Set.put(set, { pattern, func }) end)
+      end
     end
 
     def show do
-      set = Agent.get(@name, fn(set) -> set end)
-      set
+      Agent.get(@name, fn(set) -> set end)
     end
 end
