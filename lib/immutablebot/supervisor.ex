@@ -9,8 +9,9 @@ defmodule Immutablebot.Supervisor do
   end
 
   def start_workers(sup) do
-    { :ok, bot_pid } = Supervisor.start_child(sup, worker(Immutablebot.Server, []))
-    { :ok, _ } = Supervisor.start_child(sup, worker(Command.Agent, []))
+    { :ok, _command_pid } = Supervisor.start_child(sup, worker(Command.Agent, []))
+    { :ok, _bot_pid } = Supervisor.start_child(sup, worker(Immutablebot.Server, []))
+    { :ok, _socket_pid } = Supervisor.start_child(sup, worker(Immutablebot.Socket, []))
   end
 
   def init(_) do

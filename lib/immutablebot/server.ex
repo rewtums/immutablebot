@@ -13,21 +13,21 @@ defmodule Immutablebot.Server do
 
   def say(phrase, target) do
     data = "PRIVMSG #{target} :#{phrase}"
-    GenServer.cast @name, { :send, data }
+    GenServer.cast Immutablebot.Socket, { :send, data }
   end
 
   def say(data) do
-    GenServer.cast @name, {:send, data}
+    GenServer.cast Immutablebot.Socket, { :send, data }
   end
 
   def join(channel) do
     data = "JOIN #{ channel }"
-    GenServer.cast @name, { :send, data }
+    GenServer.cast Immutablebot.Socket, { :send, data }
   end
 
   def set_nick(nickname) do
     data = "NICK #{nickname}"
-    GenServer.cast @name, { :send, data }
+    GenServer.cast Immutablebot.Socket, { :send, data }
   end
 
   #####
@@ -35,20 +35,11 @@ defmodule Immutablebot.Server do
 
   defp nick, do: Application.get_env(:immutablebot, :nick)
   defp channel, do: Application.get_env(:immutablebot, :channel)
-  defp server, do: Application.get_env(:immutablebot, :server)
-  defp port, do: Application.get_env(:immutablebot, :port )
 
   #####
   # GenServer implementation
 
-  def init(:ok) do
-    { :ok, socket } = :ssl.connect(:erlang.binary_to_list(server), port, [:binary, {:active, true}])
-    say "NICK #{nick}"
-    say "USER #{nick} #{server} #{nick} :#{nick}"
-    { :ok, socket }
-  end
-
-  def handle_cast({:new_line, data}, socket) do
+  def handle_cast( { :new_line, data }, state ) do
     connected_server = Enum.at(Regex.split(~r/\s/, data), 1)
     ping      = ~r/\APING/
     motd_end  = ~r/\/MOTD/
@@ -78,17 +69,7 @@ defmodule Immutablebot.Server do
         end
       end
     end
-    { :noreply, socket }
-  end
 
-  def handle_cast({:send, data}, socket) do
-    Logger.debug "sending #{data}"
-    :ssl.send(socket, "#{data} \r\n")
-    { :noreply, socket }
-  end
-
-  def handle_info({_, _, data}, socket) do
-    GenServer.cast @name, { :new_line, data }
-    { :noreply, socket }
+    { :noreply, state }
   end
 end
