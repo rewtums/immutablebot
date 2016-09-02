@@ -56,8 +56,6 @@ defmodule Immutablebot.Server do
 
       [ speaker_name, username ] = String.split(user, "!", parts: 2, trim: true) 
 
-      command = Command.Agent.find(phrase)
-
       with { pattern, func } <- Command.Agent.find(phrase) do
         [ args ] = Regex.scan(pattern, phrase)
         result = func.(speaker_name, args)
