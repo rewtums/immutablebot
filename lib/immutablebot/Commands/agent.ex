@@ -2,11 +2,11 @@ defmodule Command.Agent do
     @name { :global, __MODULE__ }
 
     def start_link do
-      Agent.start_link( fn-> HashSet.new end, name: @name )
+      Agent.start_link( fn-> MapSet.new end, name: @name )
     end
 
     def add(command) do
-      Agent.update(@name, fn(set) -> Set.put(set, command) end)
+      Agent.update(@name, fn(set) -> MapSet.put(set, command) end)
     end
 
     def find(phrase) do
@@ -16,7 +16,7 @@ defmodule Command.Agent do
 
     def load(phrase, func) do
       with { :ok, pattern } <-  Regex.compile(phrase) do
-        Agent.update(@name, fn(set) -> Set.put(set, { pattern, func }) end)
+        Agent.update(@name, fn(set) -> MapSet.put(set, { pattern, func }) end)
       end
     end
 

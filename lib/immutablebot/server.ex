@@ -33,8 +33,8 @@ defmodule Immutablebot.Server do
   #####
   # Environment information
 
-  defp nick, do: Application.get_env(:immutablebot, :nick)
-  defp channel, do: Application.get_env(:immutablebot, :channel)
+  defp nick(), do: Application.get_env(:immutablebot, :nick)
+  defp channel(), do: Application.get_env(:immutablebot, :channel)
 
   #####
   # GenServer implementation
