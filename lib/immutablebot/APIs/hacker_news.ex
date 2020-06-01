@@ -6,7 +6,7 @@ defmodule API.Hacker_News do
       story_id
         |> get_comment
         |> hn_url
-        |> HTTPoison.get
+        |> HTTPoison.get([], [ssl: [{:verify, :verify_none}]])
         |> handle_response
         |> return_text
     else
@@ -17,7 +17,7 @@ defmodule API.Hacker_News do
 
   def get_story do
     top_stories_url
-    |> HTTPoison.get
+    |> HTTPoison.get([], [ssl: [{:verify, :verify_none}]])
     |> handle_response
     |> return_story_id
   end
@@ -25,7 +25,7 @@ defmodule API.Hacker_News do
   def comments_on_story(story) do
     story
     |> hn_url
-    |> HTTPoison.get
+    |> HTTPoison.get([], [ssl: [{:verify, :verify_none}]])
     |> handle_response
   end
 
