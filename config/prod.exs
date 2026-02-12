@@ -1,7 +1,7 @@
-use Mix.Config
+import Config
 
 config :immutablebot,
-  server: "irc.rizon.net",
-  port: 6697,
+  server: ~c"irc.rizon.net",
+  port: 9999,
   nick: "immutable-bot-dev",
-  channel: "#immutablebot"
+  channel: "#immutablebot-dev"

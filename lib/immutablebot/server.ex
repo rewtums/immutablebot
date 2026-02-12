@@ -47,20 +47,20 @@ defmodule Immutablebot.Server do
 
     Logger.debug data
 
-    if Regex.match?(motd_end, data), do: say "JOIN #{channel}"
+    if Regex.match?(motd_end, data), do: say "JOIN #{channel()}"
     if Regex.match?(ping, data), do: say "PONG #{connected_server}"
     if Regex.match?(privmsg, data) do
       [ user, _msg, target, phrase ] = data
                                          |> String.split(~r/ /, parts: 4, trim: true)
                                          |> Enum.map(&(String.replace_leading(String.trim(&1), ":", "")))
 
-      [ speaker_name, username ] = String.split(user, "!", parts: 2, trim: true) 
+      [ speaker_name, _username ] = String.split(user, "!", parts: 2, trim: true)
 
       with { pattern, func } <- Command.Agent.find(phrase) do
         [ args ] = Regex.scan(pattern, phrase)
         result = func.(speaker_name, args)
 
-        if target == "#{nick}" do
+        if target == "#{nick()}" do
           say "PRIVMSG #{speaker_name} :#{result}"
         else
           say "PRIVMSG #{target} :#{result}"

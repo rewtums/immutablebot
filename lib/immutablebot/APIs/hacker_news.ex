@@ -2,11 +2,11 @@ defmodule API.Hacker_News do
   require Logger
 
   def fetch do
-    with { :ok, story_id } <- get_story do
+    with { :ok, story_id } <- get_story() do
       story_id
         |> get_comment
         |> hn_url
-        |> HTTPoison.get([], [ssl: [versions: [:"tlsv1.2"]])
+        |> HTTPoison.get([], [ssl: [versions: [:"tlsv1.2"]]])
         |> handle_response
         |> return_text
     else
@@ -16,8 +16,8 @@ defmodule API.Hacker_News do
   end
 
   def get_story do
-    top_stories_url
-    |> HTTPoison.get([], [ssl: [versions: [:"tlsv1.2"]])
+    top_stories_url()
+    |> HTTPoison.get([], [ssl: [versions: [:"tlsv1.2"]]])
     |> handle_response
     |> return_story_id
   end
@@ -25,7 +25,7 @@ defmodule API.Hacker_News do
   def comments_on_story(story) do
     story
     |> hn_url
-    |> HTTPoison.get([], [ssl: [versions: [:"tlsv1.2"]])
+    |> HTTPoison.get([], [ssl: [versions: [:"tlsv1.2"]]])
     |> handle_response
   end
 
@@ -91,7 +91,7 @@ defmodule API.Hacker_News do
              |> Map.get("text", "")
              |> HtmlSanitizeEx.strip_tags
              |> HtmlEntities.decode
-    
+
     if String.length(text) > 298 do
       String.slice(text, 0, 298)
     else

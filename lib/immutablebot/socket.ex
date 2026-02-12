@@ -12,7 +12,7 @@ defmodule Immutablebot.Socket do
   end
 
   def init(:ok) do
-    { :ok, socket } = :ssl.connect(:erlang.binary_to_list(server()), port(), [:binary, {:active, true}])
+    { :ok, socket } = :ssl.connect(server(), port(), [{:verify, :verify_peer},{:cacerts, :public_key.cacerts_get()}])
 
     :ssl.send(socket, "NICK #{nick()} \r\n")
     :ssl.send(socket, "USER #{nick()} #{server()} #{nick()} :#{nick()} \r\n")

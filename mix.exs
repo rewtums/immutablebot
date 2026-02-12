@@ -28,9 +28,9 @@ defmodule Immutablebot.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [ { :httpoison, ">= 0.9.0" },
-      { :jsx, ">= 2.8.0" },
-      { :html_entities, "~> 0.3.0" },
-      { :html_sanitize_ex, "~> 1.0.1" } ]
+    [ { :httpoison, ">= 2.3.0" },
+      { :jsx, ">= 3.1.0" },
+      { :html_entities, "~> 0.5.0" },
+      { :html_sanitize_ex, "~> 1.4.4" } ]
   end
 end
