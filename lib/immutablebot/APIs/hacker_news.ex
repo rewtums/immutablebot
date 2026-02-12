@@ -52,7 +52,7 @@ defmodule API.Hacker_News do
   end
 
   def handle_response({ :ok, %HTTPoison.Response{status_code: _, body: body}}) do
-    { :ok, :jsx.decode(body) }
+    JSON.decode(body)
   end
 
   def handle_response({ :error, %HTTPoison.Error{id: _, reason: reason} }) do
