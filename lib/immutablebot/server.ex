@@ -40,17 +40,18 @@ defmodule Immutablebot.Server do
   # GenServer implementation
 
   def handle_cast( { :new_line, data }, state ) do
-    connected_server = Enum.at(Regex.split(~r/\s/, data), 1)
+    string_data = to_string(data)
+    connected_server = Enum.at(Regex.split(~r/\s/, to_string(data)), 1)
     ping      = ~r/\APING/
     motd_end  = ~r/\/MOTD/
     privmsg   = ~r/ PRIVMSG /
 
-    Logger.debug data
+    Logger.debug string_data
 
-    if Regex.match?(motd_end, data), do: say "JOIN #{channel()}"
-    if Regex.match?(ping, data), do: say "PONG #{connected_server}"
-    if Regex.match?(privmsg, data) do
-      [ user, _msg, target, phrase ] = data
+    if Regex.match?(motd_end, string_data), do: say "JOIN #{channel()}"
+    if Regex.match?(ping, string_data), do: say "PONG #{connected_server}"
+    if Regex.match?(privmsg, string_data) do
+      [ user, _msg, target, phrase ] = string_data
                                          |> String.split(~r/ /, parts: 4, trim: true)
                                          |> Enum.map(&(String.replace_leading(String.trim(&1), ":", "")))
 
