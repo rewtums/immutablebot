@@ -14,7 +14,7 @@ defmodule Immutablebot.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [ :logger, :httpoison ],
+    [applications: [ :logger, :httpoison, :html_sanitize_ex, :html_entities ],
      mod: {Immutablebot, []}]
   end
 
@@ -31,6 +31,6 @@ defmodule Immutablebot.Mixfile do
     [ { :httpoison, ">= 2.3.0" },
       { :jsx, ">= 3.1.0" },
       { :html_entities, "~> 0.5.0" },
-      { :html_sanitize_ex, "~> 1.4.4" } ]
+      { :html_sanitize_ex, "~> 1.4" } ]
   end
 end
